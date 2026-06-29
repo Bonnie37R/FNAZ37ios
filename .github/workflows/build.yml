@@ -24,18 +24,18 @@ jobs:
         run: |
           cd FNAZ37
           chmod +x ./node_modules/.bin/cap
-          npx cap sync
+          npx cap sync ios
 
       - name: Compile Native Xcode Project
         run: |
           cd FNAZ37
-          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO clean build
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO clean build
 
       - name: Package Into IPA
         run: |
           cd FNAZ37
           mkdir -p build/Payload
-          cp -R ios/App/build/Debug-iphoneos/App.app build/Payload/ || cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Debug-iphoneos/App.app build/Payload/
+          cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Debug-iphoneos/App.app build/Payload/ || cp -R ios/App/build/Debug-iphoneos/App.app build/Payload/
           cd build && zip -r Game.ipa Payload
 
       - name: Upload Finished IPA

@@ -1,0 +1,40 @@
+name: Build Unsigned IPA
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          cd FNAZ37
+          npm install
+          npx cap sync
+
+      - name: Compile Native Xcode Project
+        run: |
+          cd FNAZ37
+          xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO clean build
+
+      - name: Package Into IPA
+        run: |
+          cd FNAZ37
+          mkdir -p build/Payload
+          cp -R ios/App/build/Debug-iphoneos/App.app build/Payload/ || cp -R ~/Library/Developer/Xcode/DerivedData/*/Build/Products/Debug-iphoneos/App.app build/Payload/
+          cd build && zip -r Game.ipa Payload
+
+      - name: Upload Finished IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Unsigned-TurboWarp-IPA
+          path: FNAZ37/build/Game.ipa

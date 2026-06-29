@@ -13,12 +13,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Dependencies
         run: |
           cd FNAZ37
           npm install
+
+      - name: Fix Permissions and Sync
+        run: |
+          cd FNAZ37
+          chmod +x ./node_modules/.bin/cap
           npx cap sync
 
       - name: Compile Native Xcode Project
